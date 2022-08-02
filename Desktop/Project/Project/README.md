@@ -3,8 +3,6 @@
 To start this application first you can get this repo code using below url
 
 
-cd nodejs-app-mss
-
 npm install
 
 **node app.js**
