@@ -17,6 +17,8 @@ TASK_MEMORY=$(echo "$TASK_DEFINITION" | jq '. | .taskDefinition.memory | tonumbe
 
 # Register new task. No change to container definition.
 aws ecs register-task-definition --family ${TASK_FAMILY} --requires-compatibilities FARGATE --network-mode awsvpc --task-role-arn $TASK_EXEC_ROLE_ARN --execution-role-arn $TASK_EXEC_ROLE_ARN --cpu ${TASK_CPU} --memory ${TASK_MEMORY} --container-definitions "${CONTAINER_DEFINITIONS}"
+OLDTASKID=`aws ecs list-tasks --cluster bookstore --desired-status RUNNING --family apis --region ap-south-1 | egrep "task" | tr "/" " " |  awk '{print $3}' | sed 's/"$//'`
+aws ecs stop-task --cluster bookstore --task ${OLDTASKID}
 
 # Update service to use new task defn - This should pick the new image for the new revision of task defn
 aws ecs update-service --cluster "${CLUSTER}" --service "${SERVICE}"  --task-definition "${TASK_FAMILY}"
